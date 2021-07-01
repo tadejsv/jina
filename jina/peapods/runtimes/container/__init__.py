@@ -161,6 +161,7 @@ class ContainerRuntime(ZMQRuntime):
             uses_img,
             _args,
             detach=True,
+            extra_hosts={'host.docker.internal': 'host-gateway'},
             auto_remove=True,
             ports=ports,
             name=slugify(self.name),
