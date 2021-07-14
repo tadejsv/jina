@@ -89,6 +89,7 @@ class HubIO:
         console = Console()
         with console.status(f'Pushing `{self.args.path}`...') as st:
             req_header = self._get_request_header()
+            session = None
             try:
                 st.update(f'Packaging {self.args.path}...')
                 md5_hash = hashlib.md5()
@@ -118,7 +119,7 @@ class HubIO:
                 # upload the archived executor to Jina Hub
 
                 st.update(f'Uploading...')
-                resp = upload_file(
+                resp, session = upload_file(
                     hubble_url,
                     'filename',
                     content,
@@ -152,7 +153,12 @@ class HubIO:
                     raise Exception(resp.text)
                 else:
                     resp.raise_for_status()
-
+            except KeyboardInterrupt:
+                self.logger.warning(
+                    f'Pushing (session_id={req_header["jinameta-session-id"]}) is interrupted by user'
+                )
+                if session:
+                    session.close()
             except Exception as e:  # IO related errors
                 self.logger.error(
                     f'Error while pushing session_id={req_header["jinameta-session-id"]}: '

@@ -234,7 +234,7 @@ def upload_file(
     :param headers: the request header
     :param stream: receive stream response
     :param method: the request method
-    :return: the response of request
+    :return: the response and session of request
     """
     with ImportExtensions(required=True):
         import requests
@@ -247,6 +247,8 @@ def upload_file(
 
     headers.update({'Content-Type': ctype})
 
-    response = getattr(requests, method)(url, data=data, headers=headers, stream=stream)
+    session = requests.Session()
 
-    return response
+    response = getattr(session, method)(url, data=data, headers=headers, stream=stream)
+
+    return response, session
